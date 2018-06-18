@@ -56,38 +56,18 @@ for entry_point in entry_point_list:
     entry_points['console_scripts'].append('{0} = {1}'.format(entry_point[0],
                                                               entry_point[1]))
 
-# add the --cov option to the test command
-class PyTest(TestCommand):
-    """class py.test for the testing
+if (len(sys.argv) > 1) and sys.argv[1] in ['test', 'intTest', 'allTest']:
+    # set the arguments after coverage as arguments to python-cov
+    addopts = ' '.join(sys.argv[2:])
+    if sys.argv[1] == 'test':
+        target = PACKAGENAME
+    elif sys.argv[1] == 'intTest':
+        target = 'intTest'
+    else:
+        target = '{} intTest'.format(PACKAGENAME)
+    sys.argv = [sys.argv[0], 'pytest', '--addopts', '--cov {} {}'.format(target, addopts)]
+    print(' '.join(sys.argv))
 
-    """
-    user_options = []
-
-    def __init__(self, dist, **kw):
-        TestCommand.__init__(self, dist, **kw)
-        self.pytest_args = ['--cov', PACKAGENAME]
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        err_no = pytest.main(self.pytest_args)
-        sys.exit(err_no)
-
-class PyIntTest(TestCommand):
-    """class py.test for the int testing
-
-    """
-    user_options = []
-
-    def __init__(self, dist, **kw):
-        TestCommand.__init__(self, dist, **kw)
-        self.pytest_args = ['intTest']
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        err_no = pytest.main(self.pytest_args)
-        sys.exit(err_no)
 
 class PyAllTest(TestCommand):
     """class py.test for the unit and integration testing
@@ -136,7 +116,4 @@ setup(name=PACKAGENAME,
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6'
       ],
-      cmdclass = {
-          'coverage': PyTest, 'intTest': PyIntTest, 'allTest': PyAllTest
-      }
 )

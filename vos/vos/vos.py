@@ -725,9 +725,10 @@ class Node(object):
     def get_info(self):
         """Organize some information about a node and return as dictionary"""
         date = convert_vospace_time_to_seconds(self.props['date'])
-        creator = (re.search('CN=([^,]*)',
-                             self.props.get('creator', 'CN=unknown_000,'))
-                   .groups()[0].replace(' ', '_')).lower()
+        creator = self.props.get('creator', 'unknown_000')
+        if creator.startswith('CN'):
+            creator = (re.search('CN=([^,]*)', creator)
+                       .groups()[0].replace(' ', '_')).lower()
         perm = []
         for i in range(10):
             perm.append('-')
@@ -1286,7 +1287,7 @@ class EndPoints(object):
     # standard ids
     VO_PROPERTIES = 'vos://cadc.nrc.ca~vospace/CADC/std/VOSpace#nodeprops'
     VO_NODES = 'ivo://ivoa.net/std/VOSpace/v2.0#nodes'
-    VO_TRANSFER = 'ivo://ivoa.net/std/VOSpace/v2.0#sync'
+    VO_TRANSFER = 'ivo://ivoa.net/std/VOSpace#sync-2.1'
 
     subject = net.Subject()  # default subject is for anonymous access
 
@@ -1343,6 +1344,7 @@ class Client(object):
     VO_HTTPPUT_PROTOCOL = 'ivo://ivoa.net/vospace/core#httpput'
     VO_HTTPSGET_PROTOCOL = 'ivo://ivoa.net/vospace/core#httpsget'
     VO_HTTPSPUT_PROTOCOL = 'ivo://ivoa.net/vospace/core#httpsput'
+    VO_HTTPSSHFS_PROTOCOL = 'ivo://cadc.nrc.ca/vospace#SSHFS'
     DWS = '/data/pub/'
     VO_TRANSFER_PROTOCOLS = ['http', 'https']
 
@@ -1988,7 +1990,8 @@ class Client(object):
         # This is the shortcut. We do a GET request on the service with the
         # parameters sent as arguments.
 
-        direction = {'GET': 'pullFromVoSpace', 'PUT': 'pushToVoSpace'}
+        direction = {'GET': 'pullFromVoSpace', 'PUT': 'pushToVoSpace',
+                     'MOUNT': 'ivo://cadc.nrc.ca/vospace#biDirectional'}
 
         # On GET override the protocol to be http (faster) unless a
         # secure_get is requested.
@@ -1997,7 +2000,9 @@ class Client(object):
                               or Client.VO_HTTPGET_PROTOCOL),
                     'http': Client.VO_HTTPGET_PROTOCOL},
             'PUT': {'https': Client.VO_HTTPSPUT_PROTOCOL,
-                    'http': Client.VO_HTTPPUT_PROTOCOL}}
+                    'http': Client.VO_HTTPPUT_PROTOCOL},
+            'MOUNT': {'https': Client.VO_HTTPSSHFS_PROTOCOL,
+                    'http': Client.VO_HTTPSSHFS_PROTOCOL}}
 
         # build the url for that will request the url that provides access to
         # the node.
