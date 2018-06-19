@@ -61,11 +61,12 @@ def mountvofs():
 
     logger.debug("Checking connection to VOSpace ")
 
-    client = vos.Client(vospace_certfile=opt.certfile,
-                        vospace_token=opt.token)
     # TODO resourceID hardcoded for now but a scheme that supports
     # multiple vospaces is needed.
-    client.conn.resourceID = 'ivo://canfar.net/cavern'
+    vos.vos_config.parser.set('vos', 'resourceID', 'ivo://canfar.net/cavern')
+
+    client = vos.Client(vospace_certfile=opt.certfile,
+                        vospace_token=opt.token)
     # negotiate the transfer and get the mount target
     target = client.get_node_url(opt.vospace, method='MOUNT',
                                  full_negotiation=True)

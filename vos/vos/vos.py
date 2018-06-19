@@ -173,7 +173,7 @@ class Connection(object):
 
     def __init__(self, vospace_certfile=None, vospace_token=None,
                  http_debug=False,
-                 resource_id=vos_config.get('vos', 'resourceID')):
+                 resource_id=None):
         """Setup the Certificate for later usage
 
         vospace_certfile -- where to store the certificate, if None then
@@ -188,13 +188,17 @@ class Connection(object):
         attempt to find user/password combination in the .netrc file is made
         before the connection is downgraded to 'anonymous'
         """
+        if resource_id is None:
+            self.resource_id = vos_config.get('vos', 'resourceID')
+        else:
+            self.resource_id = resource_id
+
         if http_debug is not False:
             warnings.warn(
                 "Connection object no longer uses http_debug setting.",
                 DeprecationWarning)
         self.vo_token = None
         session_headers = None
-        self.resource_id = resource_id
         if vospace_token is not None:
             session_headers = {HEADER_DELEG_TOKEN: vospace_token}
             self.subject = net.Subject()
@@ -226,7 +230,7 @@ class Connection(object):
                         ('No valid authentication found. '
                          'Reverting to anonymous.'))
                     self.subject = net.Subject()
-        self.ws_client = net.BaseWsClient(resource_id, self.subject,
+        self.ws_client = net.BaseWsClient(self.resource_id, self.subject,
                                           'vos/' + version,
                                           host=os.getenv('VOSPACE_WEBSERVICE',
                                                          None),
