@@ -2002,7 +2002,7 @@ class Client(object):
             'PUT': {'https': Client.VO_HTTPSPUT_PROTOCOL,
                     'http': Client.VO_HTTPPUT_PROTOCOL},
             'MOUNT': {'https': Client.VO_HTTPSSHFS_PROTOCOL,
-                    'http': Client.VO_HTTPSSHFS_PROTOCOL}}
+                      'http': Client.VO_HTTPSSHFS_PROTOCOL}}
 
         # build the url for that will request the url that provides access to
         # the node.
