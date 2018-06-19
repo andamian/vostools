@@ -63,9 +63,12 @@ def mountvofs():
 
     client = vos.Client(vospace_certfile=opt.certfile,
                         vospace_token=opt.token)
-    client.conn.resourceID='ivo://canfar.net/cavern'
+    # TODO resourceID hardcoded for now but a scheme that supports
+    # multiple vospaces is needed.
+    client.conn.resourceID = 'ivo://canfar.net/cavern'
     # negotiate the transfer and get the mount target
-    target = client.get_node_url(opt.vospace, method='MOUNT', full_negotiation=True)
+    target = client.get_node_url(opt.vospace, method='MOUNT',
+                                 full_negotiation=True)
     assert len(target) > 0, 'No sshfs target found'
     parts = target[0].split(':')
     assert len(parts) == 4,\
@@ -73,7 +76,7 @@ def mountvofs():
     port = '-p {}'.format(parts[2])
     target = '{}:{}'.format(parts[1], parts[3])  # only part 1 and 3 needed
     cmd = ['sshfs']
-    ops = [] # operational flags
+    ops = []  # operational flags
     if platform == "darwin":
         # forward the decision whether to allow or deny an operation to the
         # target file system
@@ -85,7 +88,7 @@ def mountvofs():
         ops.append('sshfs_debug')
     if opt.nothreads:
         cmd.append('-s')
-    cmd.append('-C') # use compression
+    cmd.append('-C')  # use compression
     # This is something that could potentially be improved in production
     # Password is received through stdin but that makes it impossible to
     # have the user confirm the authenticity of the ECDSA key (which
