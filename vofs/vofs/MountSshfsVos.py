@@ -116,7 +116,8 @@ def mountvofs():
         logger.debug('Create the mount directory {}'.format(opt.mountpoint))
         os.makedirs(opt.mountpoint)
     try:
-        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         paswd = getpass.getpass('CADC password for {}'.format(user))
         out, err = p.communicate(bytes(paswd, 'UTF-8'))
