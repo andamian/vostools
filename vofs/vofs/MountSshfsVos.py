@@ -7,6 +7,7 @@ import logging
 import getpass
 import subprocess
 import sys
+import traceback
 from sys import platform
 from builtins import str
 from vos import vos
@@ -72,6 +73,7 @@ def mountvofs():
                                  full_negotiation=True)
     assert len(target) > 0, 'No sshfs target found'
     parts = target[0].split(':')
+    user = parts[1].split('@')[0]
     assert len(parts) == 4,\
         'Do not know how to parse target {}.'.format(target)
     port = '-p {}'.format(parts[2])
@@ -113,10 +115,20 @@ def mountvofs():
     if not os.path.exists(opt.mountpoint):
         logger.debug('Create the mount directory {}'.format(opt.mountpoint))
         os.makedirs(opt.mountpoint)
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    paswd = getpass.getpass(parts[1])
-    out, err = p.communicate(bytes(paswd, 'UTF-8'))
+    try:
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        paswd = getpass.getpass('CADC password for {}'.format(user))
+        out, err = p.communicate(bytes(paswd, 'UTF-8'))
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            sys.stderr.write(('ERROR:: The sshfs application not found '
+                              '(either not installed or not in the path).\n'))
+        else:
+            sys.stderr.write('ERROR: {}'.format(str(e)))
+            tb = traceback.format_exc()
+            logging.debug(tb)
+        sys.exit(-1)
 
     if p.returncode:
 
