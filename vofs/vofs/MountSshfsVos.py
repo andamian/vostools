@@ -119,7 +119,7 @@ def mountvofs():
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
-        paswd = getpass.getpass('CADC password for {}'.format(user))
+        paswd = getpass.getpass('CADC password for {}: '.format(user))
         out, err = p.communicate(bytes(paswd, 'UTF-8'))
     except OSError as e:
         if e.errno == os.errno.ENOENT:
