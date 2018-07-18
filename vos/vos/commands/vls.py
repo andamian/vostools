@@ -132,7 +132,7 @@ def vls():
         if opt.reverse:
             order = 'desc'
         else:
-            order = 'asc'
+            order = None
 
         for f in files:
             for row in client.get_children_info(f, sort, order):
