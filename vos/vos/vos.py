@@ -788,6 +788,7 @@ class Node(object):
             # children already downloaded
             for i in self.node_list:
                 yield i
+            return
 
         # stream children
         xml_file = StringIO(

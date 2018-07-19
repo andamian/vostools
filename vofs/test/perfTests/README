@@ -4,7 +4,7 @@ This is a test to compare accessing FITS files through the following means:
 - mountvofs to CADC vospace Web service
 
 To run the tests use the following command from a host running docker (host in this case is CentOS 7.0. For other hosts, the command might be slightly different):
-docker run --rm --cap-add SYS_ADMIN --device /dev/fuse --mount type=bind,source="$A",target=/admin --mount type=bind,source=/mnt/data/CADCRegtest1/,target=/data bucket.canfar.net/vmount-test -i=1 -f=fitsverify
+docker run --rm --cap-add SYS_ADMIN --device /dev/fuse --mount type=bind,source="$A",target=/admin --mount type=bind,source=/mnt/data/CADCRegtest1/,target=/data bucket.canfar.net/cadc/vmount-test -i=1 -f=fitsverify
 
 
 Where:
@@ -16,7 +16,7 @@ Where:
 
 --mount type=bind,source=/mnt/data/CADCRegtest1/,target=/data: local mount (directory) to compare against in the test. It is expected to have the same files and directory structure found in vos:CADCRegtest1/vmount-perf-test
 
-bucket.canfar.net/vmount-test: name of the image
+bucket.canfar.net/cadc/vmount-test: name of the image
 
 -i=<>: number of instances to test with (1-10)
 
@@ -28,10 +28,10 @@ Note: To make changes to the run.sh test script without rebuilding the image, si
 Running times are displayed on the output lines prefixed with *** and are in seconds.
 
 To build a new image, run the following command in the current directory:
-docker build -t bucket.canfar.net/vmount-test .
+docker build -t bucket.canfar.net/cadc/vmount-test .
 
 To push the image to the bucket repo, first login
 docker login bucket.canfar.net
 
 and then do
-docker push bucket.canfar.net/vmount-test
+docker push bucket.canfar.net/cadc/vmount-test
