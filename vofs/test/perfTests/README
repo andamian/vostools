@@ -20,6 +20,8 @@ bucket.canfar.net/cadc/vmount-test: name of the image
 
 -i=<>: number of instances to test with (1-10)
 
+-d=<>: directory to run the single mount tests (0-9)
+
 -f=<>: function to test. Values: fitsverify, gzip, gunzip
 
 Note: To make changes to the run.sh test script without rebuilding the image, simply copy or create a new run.sh script and map the location of the directory on the host to the /app directory in the container. For example, if run.sh is in the current directory on the host, add the following to the docker run command: 

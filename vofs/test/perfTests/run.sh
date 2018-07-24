@@ -3,6 +3,7 @@
 
 INST=1
 FUNC="fitsverify"
+DIR=-1
 for i in "$@"
 do
 case $i in
@@ -14,9 +15,13 @@ case $i in
     FUNC="${i#*=}"
     shift # past argument=value
     ;;
+    -d=*|--directory=*)
+    DIR="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
         # unknown option
-        echo "container arguments: -i|--instances=[1..] -f|--function=[fitsverify|gzip|gunzip]"
+        echo "container arguments: [-i|--instances=[1..] | -d|--directory=[1..]] -f|--function=[fitsverify|gzip|gunzip]"
         exit -1
     ;;
 esac
@@ -30,6 +35,12 @@ fi
 if [ "$INST" -lt "1" ]; then
     echo "Invalid number of instances $INST (Must be > 0)"
     exit -1
+fi
+if [ "$DIR" -gt "-1" ]; then
+    if [ "$INST" -gt "1" ]; then
+        echo "-d|--directory can only be used with single instance"
+        exit -1
+    fi
 fi
 
 set PASS_FILE='/admin/etc/cadcregtest1.pass1'
@@ -138,7 +149,11 @@ do
     count=0
     while [ "$count" -lt "$INST" ];
     do
-        run_test ${s_targets[$index]}/$count $FUNC&
+        if [ "$DIR" -gt "-1" ]; then
+            run_test ${s_targets[$index]}/$DIR $FUNC
+        else
+            run_test ${s_targets[$index]}/$count $FUNC
+        fi
         let count=count+1
     done
     wait
