@@ -52,20 +52,18 @@ fi
 
 
 VMOUNT_ROOT='/tmp/cadcregtest1/vmount'
-MOUNTVOFS_ROOT='/tmp/cadcregtest1/mountvofs'
 EXT_ROOT='/data'
 
 
 ############################## single mount point setup ######################################
 S_VMOUNT=$VMOUNT_ROOT/one
-S_MOUNTVOFS=$MOUNTVOFS_ROOT/one
 S_EXT=$EXT_ROOT
 
 if [ ! -d $EXT_EXT ]; then
     echo "No external volume found to test against"
-    s_targets=($S_VMOUNT $S_MOUNTVOFS)
+    s_targets=($S_VMOUNT)
 else
-    s_targets=($S_VMOUNT $S_MOUNTVOFS $S_EXT)
+    s_targets=($S_VMOUNT $S_EXT)
 fi
 
 # create the single mount points
@@ -74,18 +72,12 @@ mkdir -p $S_VMOUNT
 vmount --cert /admin/test-certificates/x509_CADCRegtest1.pem \
     vos:CADCRegtest1/vmount-perf-test $S_VMOUNT <<< $(cat /admin/etc/cadcregtest1.pass) || (echo "ERROR: vmount" && exit -1)
 
-echo "create the vofs mount at $S_MOUNTVOFS"
-mkdir -p $S_MOUNTVOFS
-mountvofs  --cert=/admin/test-certificates/x509_CADCRegtest1.pem \
-    --vospace=vos:CADCRegtest1/vmount-perf-test --mountpoint=$S_MOUNTVOFS --log=/tmp/vofs_dir.log || (echo "ERROR: mountvofs" && exit -1)
-
 
 ############################## multiple mount points setup ######################################
 M_VMOUNT=$VMOUNT_ROOT
-M_MOUNTVOFS=$MOUNTVOFS_ROOT
 M_EXT=$EXT_ROOT
 
-m_targets=($M_VMOUNT $M_MOUNTVOFS)
+m_targets=($M_VMOUNT)
 count=0
 while [ "$count" -lt "$INST" ];
 do
@@ -97,10 +89,6 @@ do
     #    /tmp/CADCRegtest1/ -p 10022 -C -o password_stdin,StrictHostKeyChecking=no\
     #<<< $(cat /admin/etc/cadcregtest1.pass)
 
-    echo "create the vofs mount at $M_MOUNTVOFS/$count to point to vmount-perf-test/$count"
-    mkdir -p $M_MOUNTVOFS/$count
-    mountvofs  --cert=/admin/test-certificates/x509_CADCRegtest1.pem \
-        --vospace=vos:CADCRegtest1/vmount-perf-test/$count --mountpoint=$M_MOUNTVOFS/$count --log=/tmp/vofs_dir.log || (echo "ERROR: mountvofs" && exit -1)
     let count=count+1
 done
 
@@ -162,18 +150,11 @@ done
 
 if [ "$INST" -gt "1" ]; then
     echo "--- Running $INST instances on $INST mounts* ---"
-    echo "* - only for vmount and mountvofs"
+    echo "* - only for vmount"
     count=0
     while [ "$count" -lt "$INST" ];
     do
         run_test $M_VMOUNT/$count $FUNC&
-        let count=count+1
-    done
-    wait
-    count=0
-    while [ "$count" -lt "$INST" ];
-    do
-        run_test $M_MOUNTVOFS/$count $FUNC&
         let count=count+1
     done
     wait
