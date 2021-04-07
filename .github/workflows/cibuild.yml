@@ -48,8 +48,7 @@ jobs:
     - name: Test ${{ matrix.package }}
       run: |
         echo py${{ matrix.python-version }} | sed 's/\.//'
-        echo "**************"
-        cd ${{ matrix.package }} && tox -e py${{ matrix.python-version }}
+        cd ${{ matrix.package }} && tox -e ${py${{ matrix.python-version }} | sed 's/\.//'}
 
   style_n_coverage:
     runs-on: ubuntu-latest
