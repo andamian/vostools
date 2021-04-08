@@ -48,9 +48,7 @@ jobs:
     - name: Test ${{ matrix.package }}
       run: |
         tox_target=$(echo ${{matrix.python-version}} | sed 's/\.//')
-        echo $tox_target
-        echo "*******"
-        cd ${{ matrix.package }} && tox -e $(echo ${{matrix.python-version}} | sed 's/\.//')
+        cd ${{ matrix.package }} && tox -e py$(echo ${{matrix.python-version}} | sed 's/\.//')
 
   style_n_coverage:
     runs-on: ubuntu-latest
